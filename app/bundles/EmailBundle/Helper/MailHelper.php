@@ -2141,12 +2141,8 @@ class MailHelper
                 }
             }
         }
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> 4368fac19827a7aa08fac2f47f64070835c7a5e9
-        if (array_key_exists('List-Unsubscribe', $headers)) {
+	
+	if (array_key_exists('List-Unsubscribe', $headers)) {
             unset($headers['List-Unsubscribe']);
             $this->setCustomHeaders($headers, false);
         }
