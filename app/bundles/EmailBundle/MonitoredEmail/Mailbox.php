@@ -21,7 +21,6 @@ namespace Mautic\EmailBundle\MonitoredEmail;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
-use Mautic\EmailBundle\MonitoredEmail\Exception\NotConfiguredException;
 use stdClass;
 
 class Mailbox
@@ -169,8 +168,6 @@ class Mailbox
     protected $isGmail = false;
     protected $mailboxes;
 
-    private $folders = [];
-
     /**
      * Mailbox constructor.
      *
@@ -284,12 +281,14 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /* @var string $host */
-        /* @var int $port */
-        /* @var string $encryption */
-        /* @var string $folder */
-        /* @var string $user */
-        /* @var string $password */
+        /*
+         * @var $host
+         * @var $port
+         * @var $encryption
+         * @var $folder
+         * @var $user
+         * @var $password
+         */
         extract($settings);
         if (!isset($encryption)) {
             $encryption = (!empty($ssl)) ? '/ssl' : '';
@@ -404,10 +403,6 @@ class Mailbox
     protected function initImapStream()
     {
         imap_timeout(IMAP_OPENTIMEOUT, 15);
-        imap_timeout(IMAP_CLOSETIMEOUT, 15);
-        imap_timeout(IMAP_READTIMEOUT, 15);
-        imap_timeout(IMAP_WRITETIMEOUT, 15);
-
         $imapStream = @imap_open(
             $this->imapFullPath,
             $this->settings['user'],
@@ -483,11 +478,9 @@ class Mailbox
      */
     public function getListingFolders()
     {
-        if (!$this->isConfigured()) {
-            throw new NotConfiguredException('mautic.email.config.monitored_email.not_configured');
-        }
+        static $folders = [];
 
-        if (!isset($this->folders[$this->imapFullPath])) {
+        if (!isset($folders[$this->imapFullPath]) && $this->isConfigured()) {
             $tempFolders = @imap_list($this->getImapStream(), $this->imapPath, '*');
 
             if (!empty($tempFolders)) {
@@ -499,10 +492,10 @@ class Mailbox
                 $tempFolders = [];
             }
 
-            $this->folders[$this->imapFullPath] = $tempFolders;
+            $folders[$this->imapFullPath] = $tempFolders;
         }
 
-        return $this->folders[$this->imapFullPath];
+        return $folders[$this->imapFullPath];
     }
 
     /**

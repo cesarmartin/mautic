@@ -233,8 +233,8 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @param string          $channel
-     * @param string|int|null $channelId
+     * @param      $channel
+     * @param null $channelId
      *
      * @return $this
      */

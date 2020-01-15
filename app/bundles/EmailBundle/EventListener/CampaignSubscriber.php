@@ -339,8 +339,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             foreach ($stats as $contactId => $sentCount) {
                 /** @var LeadEventLog $log */
                 $log = $event->findLogByContactId($contactId);
-                // Pass with a note to the UI because no use retrying
-                $event->passWithError(
+                $event->fail(
                     $log,
                     $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $credentialArray[$log->getId()]['primaryIdentifier']])
                 );

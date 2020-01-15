@@ -84,10 +84,6 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
-        $this->translations['dnc_manual_email'] = [
-            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
-        ];
-
         $this->translations['dnc_unsubscribed_sms'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];

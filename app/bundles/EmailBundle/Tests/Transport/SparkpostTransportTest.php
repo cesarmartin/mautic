@@ -11,75 +11,31 @@
 
 namespace Mautic\EmailBundle\Tests\Transport;
 
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Stream;
-use Http\Adapter\Guzzle6\Client;
-use Http\Promise\Promise;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Model\TransportCallback;
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Psr\Log\LoggerInterface;
-use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
 {
-    private $translator;
-    private $transportCallback;
-    private $httpClient;
-    private $promise;
-    private $response;
-    private $stream;
-    private $message;
-    private $headers;
-    private $sparkpostFactory;
-    private $sparkpostClient;
-    private $sparkpostTransport;
-    private $logger;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->translator         = $this->createMock(TranslatorInterface::class);
-        $this->transportCallback  = $this->createMock(TransportCallback::class);
-        $this->httpClient         = $this->createMock(Client::class);
-        $this->promise            = $this->createMock(Promise::class);
-        $this->response           = $this->createMock(Response::class);
-        $this->stream             = $this->createMock(Stream::class);
-        $this->message            = $this->createMock(MauticMessage::class);
-        $this->headers            = $this->createMock(\Swift_Mime_HeaderSet::class);
-        $this->sparkpostFactory   = $this->createMock(SparkpostFactoryInterface::class);
-        $this->logger             = $this->createMock(LoggerInterface::class);
-        $this->sparkpostClient    = new SparkPost($this->httpClient, ['key' => '1234']);
-        $this->sparkpostTransport = new SparkpostTransport(
-            '1234',
-            $this->translator,
-            $this->transportCallback,
-            $this->sparkpostFactory,
-            $this->logger
-        );
-
-        $this->translator->method('trans')
-            ->willReturnCallback(function ($key) {
-                return $key;
-            });
-
-        $this->httpClient->method('sendAsyncRequest')->willReturn($this->promise);
-        $this->promise->method('wait')->willReturn($this->response);
-        $this->message->method('getChildren')->willReturn([]);
-        $this->message->method('getHeaders')->willReturn($this->headers);
-        $this->headers->method('getAll')->willReturn([]);
-        $this->response->method('getBody')->willReturn($this->stream);
-        $this->sparkpostFactory->method('create')->willReturn($this->sparkpostClient);
-    }
-
     public function testWebhookPayloadIsProcessed()
     {
-        $this->transportCallback->expects($this->exactly(6))
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator->method('trans')
+            ->willReturnCallback(
+                function ($key) {
+                    return $key;
+                }
+            );
+
+        $transportCallback = $this->getMockBuilder(TransportCallback::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $transportCallback->expects($this->exactly(6))
             ->method('addFailureByHashId')
             ->withConsecutive(
                 [$this->equalTo('1'), 'MAIL REFUSED - IP (17.99.99.99) is in black list', DoNotContact::BOUNCED],
@@ -89,9 +45,9 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
                 [$this->equalTo('5'), 'unsubscribed', DoNotContact::UNSUBSCRIBED],
                 [$this->equalTo('6'), 'unsubscribed', DoNotContact::UNSUBSCRIBED]
                 // cc recipient type is ignored so addFailureByHashId should not be called
-            );
+        );
 
-        $this->transportCallback->expects($this->once())
+        $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
             ->with(
                 'bounce@example.com',
@@ -99,92 +55,9 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
                 DoNotContact::BOUNCED
             );
 
-        $this->sparkpostTransport->processCallbackRequest($this->getRequestWithPayload());
-    }
+        $sparkpost = new SparkpostTransport('1234', $translator, $transportCallback);
 
-    /**
-     * @see https://www.sparkpost.com/blog/error-handling-transmissions-api/
-     */
-    public function testSendWithOldErrorResponse()
-    {
-        $templateCheckPayload = '{
-            "results": {
-                "subject": "Summer deals for Natalie",
-                "html": "<b>Check out these deals Natalie!</b>"
-            }
-        }';
-        $transmissionPayload = '{  
-            "errors":[{
-                "description":"Unconfigured or unverified sending domain.",
-                "code":"1902",
-                "message":"Invalid domain"
-            }]
-        }';
-
-        $this->message->method('getMetadata')->willReturn(['jane@doe.email' => ['leadId' => 21]]);
-        $this->message->method('getSubject')->willReturn('Top secret');
-        $this->message->method('getFrom')->willReturn(['john@doe.email' => 'John']);
-        $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
-        $this->response->method('getStatusCode')->willReturn(200);
-
-        $this->stream->expects($this->at(0))
-            ->method('__toString')
-            ->willReturn($templateCheckPayload);
-
-        $this->stream->expects($this->at(1))
-            ->method('__toString')
-            ->willReturn($transmissionPayload);
-
-        $this->transportCallback
-            ->expects($this->once())
-            ->method('addFailureByContactId')
-            ->with(21, 'Unconfigured or unverified sending domain.', DoNotContact::BOUNCED, null);
-
-        $this->expectExceptionMessage('Unconfigured or unverified sending domain.');
-        $this->sparkpostTransport->send($this->message);
-    }
-
-    /**
-     * @see https://www.sparkpost.com/blog/error-handling-transmissions-api/
-     */
-    public function testSendWithNewErrorResponse()
-    {
-        $templateCheckPayload = '{
-            "results": {
-                "subject": "Summer deals for Natalie",
-                "html": "<b>Check out these deals Natalie!</b>"
-            }
-        }';
-        $transmissionPayload = '{  
-            "errors":[  
-              {
-                "code":"1902",
-                "message":"Invalid domain"
-              }
-            ]
-        }';
-
-        $this->message->method('getMetadata')->willReturn(['jane@doe.email' => ['leadId' => 21]]);
-        $this->message->method('getSubject')->willReturn('Top secret');
-        $this->message->method('getFrom')->willReturn(['john@doe.email' => 'John']);
-        $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
-        $this->response->method('getStatusCode')->willReturn(200);
-
-        $this->stream->expects($this->at(0))
-            ->method('__toString')
-            ->willReturn($templateCheckPayload);
-
-        $this->stream->expects($this->at(1))
-            ->method('__toString')
-            ->willReturn($transmissionPayload);
-
-        $this->transportCallback
-            ->expects($this->once())
-            ->method('addFailureByContactId')
-            ->with(21, 'Invalid domain', DoNotContact::BOUNCED, null);
-
-        $this->expectExceptionMessage('Invalid domain');
-        $this->sparkpostTransport->send($this->message);
+        $sparkpost->processCallbackRequest($this->getRequestWithPayload());
     }
 
     private function getRequestWithPayload()

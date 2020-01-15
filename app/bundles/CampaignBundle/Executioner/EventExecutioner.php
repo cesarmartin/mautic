@@ -394,7 +394,7 @@ class EventExecutioner
 
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$event->getId().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s e')
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
             );
 
             // Check if we need to schedule this if it is not an inactivity check

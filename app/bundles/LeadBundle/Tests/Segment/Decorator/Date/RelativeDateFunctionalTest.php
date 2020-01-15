@@ -160,7 +160,7 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         /** @var LeadRepository $leadRepository */
         $leadRepository = $this->container->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
 
-        $date = new \DateTime($initialTime, new \DateTimeZone('UTC'));
+        $date = new \DateTime($initialTime);
         $date->modify($dateModifier);
 
         $lead = new Lead();

@@ -274,7 +274,6 @@ return [
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',
                     'mautic.helper.ip_lookup',
-                    'mautic.campaign.scheduler',
                 ],
             ],
         ],

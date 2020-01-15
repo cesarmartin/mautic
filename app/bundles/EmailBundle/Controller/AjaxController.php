@@ -185,7 +185,7 @@ class AjaxController extends CommonAjaxController
                 $dataArray['success'] = 1;
                 $dataArray['message'] = $this->translator->trans('mautic.core.success');
             } catch (\Exception $e) {
-                $dataArray['message'] = $this->translator->trans($e->getMessage());
+                $dataArray['message'] = $e->getMessage();
             }
         }
 

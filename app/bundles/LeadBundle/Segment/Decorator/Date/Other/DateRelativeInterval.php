@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
-use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
@@ -29,23 +28,13 @@ class DateRelativeInterval implements FilterDecoratorInterface
     private $originalValue;
 
     /**
-     * @var DateOptionParameters
+     * @param DateDecorator $dateDecorator
+     * @param string        $originalValue
      */
-    private $dateOptionParameters;
-
-    /**
-     * @param DateDecorator        $dateDecorator
-     * @param string               $originalValue
-     * @param DateOptionParameters $dateOptionParameters
-     */
-    public function __construct(
-        DateDecorator $dateDecorator,
-        $originalValue,
-        DateOptionParameters $dateOptionParameters
-    ) {
-        $this->dateDecorator        = $dateDecorator;
-        $this->originalValue        = $originalValue;
-        $this->dateOptionParameters = $dateOptionParameters;
+    public function __construct(DateDecorator $dateDecorator, $originalValue)
+    {
+        $this->dateDecorator = $dateDecorator;
+        $this->originalValue = $originalValue;
     }
 
     /**
@@ -103,7 +92,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $date = $this->dateOptionParameters->getDefaultDate();
+        $date = $this->dateDecorator->getDefaultDate();
         $date->modify($this->originalValue);
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
@@ -112,7 +101,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
             $format .= '%';
         }
 
-        return $date->toLocalString($format);
+        return $date->toUtcString($format);
     }
 
     /**

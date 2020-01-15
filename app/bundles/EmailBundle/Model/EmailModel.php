@@ -1481,7 +1481,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel->finalFlush();
 
         // Get the errors to return
-        $errorMessages  = $errors + $this->sendModel->getErrors();
+        $errorMessages  = array_merge($errors, $this->sendModel->getErrors());
         $failedContacts = $this->sendModel->getFailedContacts();
 
         // Get sent counts to update email stats
@@ -1560,10 +1560,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
-        $mailer            = $this->mailHelper->getMailer();
-        if (!isset($lead['companies'])) {
-            $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
-        }
+        $mailer = $this->mailHelper->getMailer();
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));

@@ -11,6 +11,9 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * Class DateTimeHelper.
+ */
 class DateTimeHelper
 {
     /**
@@ -39,14 +42,14 @@ class DateTimeHelper
     private $local;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTime
      */
     private $datetime;
 
     /**
-     * @param \DateTimeInterface|string $string
-     * @param string                    $fromFormat Format the string is in
-     * @param string                    $timezone   Timezone the string is in
+     * @param \DateTime|string $string
+     * @param string           $fromFormat Format the string is in
+     * @param string           $timezone   Timezone the string is in
      */
     public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
     {
@@ -56,9 +59,9 @@ class DateTimeHelper
     /**
      * Sets date/time.
      *
-     * @param \DateTimeInterface|string $datetime
-     * @param string                    $fromFormat
-     * @param string                    $timezone
+     * @param \DateTime|string $datetime
+     * @param string           $fromFormat
+     * @param string           $timezone
      */
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
     {
@@ -72,9 +75,9 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone($timezone);
+        $this->local = new \DateTimeZone(date_default_timezone_get());
 
-        if ($datetime instanceof \DateTimeInterface) {
+        if ($datetime instanceof \DateTime) {
             $this->datetime = $datetime;
             $this->timezone = $datetime->getTimezone()->getName();
             $this->string   = $this->datetime->format($fromFormat);
@@ -241,7 +244,7 @@ class DateTimeHelper
      * @param            $intervalString
      * @param bool|false $clone          If true, return a new \DateTime rather than update current one
      *
-     * @return \DateTimeInterface
+     * @return \DateTime
      */
     public function add($intervalString, $clone = false)
     {
@@ -263,7 +266,7 @@ class DateTimeHelper
      * @param            $intervalString
      * @param bool|false $clone          If true, return a new \DateTime rather than update current one
      *
-     * @return \DateTimeInterface
+     * @return \DateTime
      */
     public function sub($intervalString, $clone = false)
     {
@@ -319,7 +322,7 @@ class DateTimeHelper
      * @param            $string
      * @param bool|false $clone  If true, return a new \DateTime rather than update current one
      *
-     * @return \DateTimeInterface
+     * @return \DateTime
      */
     public function modify($string, $clone = false)
     {

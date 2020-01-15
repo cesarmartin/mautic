@@ -61,7 +61,7 @@ class ContentHelper extends Helper
             $viewName = $vars['mauticTemplate'];
         }
 
-        /** @var CustomContentEvent $event */
+        /** @var ContentEvent $event */
         $event = $this->dispatcher->dispatch(
             CoreEvents::VIEW_INJECT_CUSTOM_CONTENT,
             new CustomContentEvent($viewName, $context, $vars)
@@ -69,9 +69,9 @@ class ContentHelper extends Helper
 
         $content = $event->getContent();
 
-        if ($templatProps = $event->getTemplates()) {
-            foreach ($templatProps as $props) {
-                $content[] = $this->templating->render($props['template'], array_merge($vars, $props['vars']));
+        if ($templates = $event->getTemplates()) {
+            foreach ($templates as $template => $templateVars) {
+                $content[] = $this->templating->render($template, array_merge($vars, $templateVars));
             }
         }
 

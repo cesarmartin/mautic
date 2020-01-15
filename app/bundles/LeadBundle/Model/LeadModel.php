@@ -527,7 +527,7 @@ class LeadModel extends FormModel
                 }
             }
 
-            if (!$entity->getCompany() && !empty($details['organization']) && $this->coreParametersHelper->getParameter('ip_lookup_create_organization', false)) {
+            if (!$entity->getCompany() && !empty($details['organization'])) {
                 $entity->addUpdatedField('company', $details['organization']);
             }
         }
@@ -1439,11 +1439,8 @@ class LeadModel extends FormModel
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
             $addresses = explode(',', $data[$fields['ip']]);
             foreach ($addresses as $address) {
-                $address = trim($address);
-                if (!$ipAddress = $this->ipAddressModel->findOneByIpAddress($address)) {
-                    $ipAddress = new IpAddress();
-                    $ipAddress->setIpAddress($address);
-                }
+                $ipAddress = new IpAddress();
+                $ipAddress->setIpAddress(trim($address));
                 $lead->addIpAddress($ipAddress);
             }
         }
@@ -1504,23 +1501,18 @@ class LeadModel extends FormModel
         unset($fieldData['stage']);
 
         // Set unsubscribe status
-        if (!empty($fields['doNotEmail']) && isset($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
-            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            if (null !== $doNotEmail) {
+        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
+            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
+            if ($doNotEmail) {
                 $reason = $this->translator->trans('mautic.lead.import.by.user', [
                     '%user%' => $this->userHelper->getUser()->getUsername(),
                 ]);
 
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
-                if ($doNotEmail) {
-                    $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
-                } else {
-                    $this->removeDncForLead($lead, 'email', true);
-                }
+                $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
             }
         }
-
         unset($fieldData['doNotEmail']);
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {

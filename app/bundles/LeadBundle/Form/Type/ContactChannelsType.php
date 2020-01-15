@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,6 +16,8 @@ class ContactChannelsType extends AbstractType
     private $coreParametersHelper;
 
     /**
+     * ContactFrequencyType constructor.
+     *
      * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
@@ -122,6 +123,7 @@ class ContactChannelsType extends AbstractType
                             'class'       => 'frequency-date form-control',
                         ]
                     );
+                    $type = 'datetime';
                 } else {
                     $attributes = array_merge(
                         $attr,
@@ -129,32 +131,30 @@ class ContactChannelsType extends AbstractType
                             'class' => 'form-control',
                         ]
                     );
+                    $type = 'date';
                 }
-
                 if (!$options['public_view'] || $showContactPauseDates) {
                     $builder->add(
                         'contact_pause_start_date_'.$channel,
-                        DateType::class,
+                        $type,
                         [
                             'widget'     => 'single_text',
-                            'label'      => false,
+                            'label'      => false, //'mautic.lead.frequency.contact.start.date',
                             'label_attr' => ['class' => 'text-muted fw-n label3'],
                             'attr'       => $attributes,
-                            'format'     => $options['public_view'] ? DateType::HTML5_FORMAT : 'yyyy-MM-dd',
-                            'html5'      => $options['public_view'],
+                            'format'     => 'yyyy-MM-dd',
                             'required'   => false,
                         ]
                     );
                     $builder->add(
                         'contact_pause_end_date_'.$channel,
-                        DateType::class,
+                        $type,
                         [
                             'widget'     => 'single_text',
                             'label'      => 'mautic.lead.frequency.contact.end.date',
                             'label_attr' => ['class' => 'frequency-label text-muted fw-n label4'],
                             'attr'       => $attributes,
-                            'format'     => $options['public_view'] ? DateType::HTML5_FORMAT : 'yyyy-MM-dd',
-                            'html5'      => $options['public_view'],
+                            'format'     => 'yyyy-MM-dd',
                             'required'   => false,
                         ]
                     );

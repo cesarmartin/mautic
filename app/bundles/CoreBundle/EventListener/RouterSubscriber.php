@@ -95,15 +95,8 @@ class RouterSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $originalContext = $this->router->getContext();
-        if ($originalContext->getBaseUrl() && !$this->baseUrl) {
-            // Likely in installation where the request parameters passed into this listener are not set yet so just use the original context
-            return;
-        }
-
-        // Append index_dev.php for installations at the root level
-        if ('dev' === MAUTIC_ENV && strpos($this->baseUrl, 'index_dev.php') === false) {
-            $this->baseUrl = $this->baseUrl.'/index_dev.php';
+        if ('dev' === MAUTIC_ENV) {
+            $this->baseUrl = '/index_dev.php'.$this->baseUrl;
         }
 
         $context = $this->router->getContext();

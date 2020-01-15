@@ -147,3 +147,4 @@ class PageSubscriberTest extends WebTestCase
         return array_fill_keys(['request', 'isNew', 'hitId', 'pageId', 'leadId'], null);
     }
 }
+

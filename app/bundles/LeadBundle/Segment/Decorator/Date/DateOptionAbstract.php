@@ -125,7 +125,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $dateTimeHelper = $this->dateOptionParameters->getDefaultDate();
+        $dateTimeHelper = $this->dateDecorator->getDefaultDate();
 
         $this->modifyBaseDate($dateTimeHelper);
 
@@ -141,7 +141,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
             $dateTimeHelper->modify($modifier);
         }
 
-        return $dateTimeHelper->toLocalString($dateFormat);
+        return $dateTimeHelper->toUtcString($dateFormat);
     }
 
     /**

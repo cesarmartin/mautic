@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval;
-use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis;
@@ -263,9 +262,8 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private function getFilterDecorator($filterName)
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
-        $relativeDate     = $this->createMock(RelativeDate::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $dateDecorator = $this->createMock(DateDecorator::class);
+        $relativeDate  = $this->createMock(RelativeDate::class);
 
         $relativeDate->method('getRelativeDateStrings')
             ->willReturn(
@@ -287,7 +285,7 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate, $timezoneResolver);
+        $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate);
 
         $filter                    = [
             'glue'     => 'and',

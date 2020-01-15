@@ -272,9 +272,6 @@ trait EntityFieldsBuildFormTrait
                                 ]
                             );
                             break;
-                        case 'text':
-                            $constraints[] = new Length(['max' => 255]);
-                            break;
                         case 'multiselect':
                             if ($type == 'multiselect') {
                                 $constraints[] = new Length(['max' => 255]);

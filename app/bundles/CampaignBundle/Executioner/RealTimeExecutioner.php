@@ -210,7 +210,7 @@ class RealTimeExecutioner
             $executionDate = $this->scheduler->getExecutionDateTime($child, $now);
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s e')
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
             );
 
             if ($this->scheduler->shouldSchedule($executionDate, $now)) {

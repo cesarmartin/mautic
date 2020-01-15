@@ -63,14 +63,9 @@ class ScheduledContactFinder
 
         $contacts = $this->leadRepository->getContactCollection($contactIds);
 
-        foreach ($logs as $key => $log) {
+        foreach ($logs as $log) {
             $contactId = $log->getLead()->getId();
-            if (!$contact = $contacts->get($contactId)) {
-                // the contact must have been deleted mid execution so remove this log from memory
-                $logs->remove($key);
-
-                continue;
-            }
+            $contact   = $contacts->get($contactId);
 
             $log->setLead($contact);
         }

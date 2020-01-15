@@ -811,8 +811,7 @@ class MailHelper
             // Stash attachment to be processed by the transport
             $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
         } else {
-            // filePath can contain the value of a local file path or the value of an URL where the file can be found
-            if (filter_var($filePath, FILTER_VALIDATE_URL) || (file_exists($filePath) && is_readable($filePath))) {
+            if (file_exists($filePath) && is_readable($filePath)) {
                 try {
                     $attachment = \Swift_Attachment::fromPath($filePath);
 
@@ -1025,17 +1024,9 @@ class MailHelper
      */
     public function setTo($addresses, $name = null)
     {
-        $name = $this->cleanName($name);
-
         if (!is_array($addresses)) {
+            $name      = $this->cleanName($name);
             $addresses = [$addresses => $name];
-        } elseif (array_keys($addresses)[0] === 0) {
-            // We need an array of $email => $name pairs
-            $addresses = array_reduce($addresses, function ($address, $item) use ($name) {
-                $address[$item] = $name;
-
-                return $address;
-            }, []);
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
@@ -1651,17 +1642,15 @@ class MailHelper
     protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
-            $exceptionContext = ['exception' => $error];
-            $errorMessage     = $error->getMessage();
-            $error            = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
+            $errorMessage = $error->getMessage();
+            $error        = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
 
             // Clean up the error message
             $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
 
             $this->fatal = true;
         } else {
-            $exceptionContext = [];
-            $errorMessage     = trim($error);
+            $errorMessage = trim($error);
         }
 
         $logDump = $this->logger->dump();
@@ -1681,7 +1670,7 @@ class MailHelper
 
         $this->logger->clear();
 
-        $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error, $exceptionContext);
+        $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error);
     }
 
     /**
@@ -2141,8 +2130,8 @@ class MailHelper
                 }
             }
         }
-	
-	if (array_key_exists('List-Unsubscribe', $headers)) {
+        
+        if (array_key_exists('List-Unsubscribe', $headers)) {
             unset($headers['List-Unsubscribe']);
             $this->setCustomHeaders($headers, false);
         }

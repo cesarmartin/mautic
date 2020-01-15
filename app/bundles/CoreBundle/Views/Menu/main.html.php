@@ -60,7 +60,7 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
         if (!isset($labelAttributes['class'])) {
             $labelAttributes['class'] = 'nav-item-name';
         }
-        $labelPull = empty($extras['depth']) ? ' pull-left' : '';
+        $labelPull = $extras['depth'] === 0 ? ' pull-left' : '';
         $labelAttributes['class'] .= ' text'.$labelPull;
 
         echo "<span{$view['menu']->parseAttributes($labelAttributes)}>{$view['translator']->trans($child->getLabel())}</span>";

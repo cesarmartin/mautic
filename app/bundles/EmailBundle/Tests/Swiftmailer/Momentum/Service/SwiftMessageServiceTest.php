@@ -72,46 +72,40 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "email":"to1@test.local",
                         "name":"To1 test",
                         "header_to":"to1@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"to2@test.local",
                         "name":"To2 test",
                         "header_to":"to2@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"cc1@test.local",
                         "name":"CC1 test",
                         "header_to":"cc1@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"cc2@test.local",
                         "name":"CC2 test",
                         "header_to":"cc2@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"bcc1@test.local",
                         "name":"BCC1 test"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"bcc2@test.local",
                         "name":"BCC2 test"
-                     },
-                     "substitution_data": {}
+                     }
                   }
                ],
                "content":{
@@ -214,30 +208,26 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "email":"cc1@test.local",
                         "name":"CC1 test",
                         "header_to":"cc1@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"cc2@test.local",
                         "name":"CC2 test",
                         "header_to":"cc2@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"bcc1@test.local",
                         "name":"BCC1 test"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"bcc2@test.local",
                         "name":"BCC2 test"
-                     },
-                     "substitution_data": {}
+                     }
                   }
                ],
                "content":{
@@ -354,30 +344,26 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "email":"cc1@test.local",
                         "name":"CC1 test",
                         "header_to":"cc1@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"cc2@test.local",
                         "name":"CC2 test",
                         "header_to":"cc2@test.local"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"bcc1@test.local",
                         "name":"BCC1 test"
-                     },
-                     "substitution_data": {}
+                     }
                   },
                   {
                      "address":{
                         "email":"bcc2@test.local",
                         "name":"BCC2 test"
-                     },
-                     "substitution_data": {}
+                     }
                   }
                ],
                "content":{

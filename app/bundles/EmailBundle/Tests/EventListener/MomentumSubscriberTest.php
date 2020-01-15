@@ -20,16 +20,12 @@ use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class MomentumSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $queueServiceMock;
     private $momentumCallbackMock;
-    private $requestStorageHelperMock;
-    private $loggerMock;
-    private $momentumSubscriber;
 
     protected function setUp()
     {
@@ -38,13 +34,7 @@ class MomentumSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->momentumCallbackMock     = $this->createMock(MomentumCallbackInterface::class);
         $this->queueServiceMock         = $this->createMock(QueueService::class);
         $this->requestStorageHelperMock = $this->createMock(RequestStorageHelper::class);
-        $this->loggerMock               = $this->createMock(LoggerInterface::class);
-        $this->momentumSubscriber       = new MomentumSubscriber(
-            $this->momentumCallbackMock,
-            $this->queueServiceMock,
-            $this->requestStorageHelperMock,
-            $this->loggerMock
-        );
+        $this->momentumSubscriber       = new MomentumSubscriber($this->momentumCallbackMock, $this->queueServiceMock, $this->requestStorageHelperMock);
     }
 
     public function testOnMomentumWebhookQueueProcessingForNonMomentumTransport()
@@ -97,41 +87,6 @@ class MomentumSubscriberTest extends \PHPUnit_Framework_TestCase
 
                 return true;
             }));
-
-        $queueConsumerEvent->expects($this->once())
-            ->method('setResult')
-            ->with(QueueConsumerResults::ACKNOWLEDGE);
-
-        $this->momentumSubscriber->onMomentumWebhookQueueProcessing($queueConsumerEvent);
-    }
-
-    public function testOnMomentumWebhookQueueProcessingForMomentumTransportIfRequestNotFounc()
-    {
-        $queueConsumerEvent = $this->createMock(QueueConsumerEvent::class);
-
-        $queueConsumerEvent->expects($this->once())
-            ->method('getPayload')
-            ->willReturn([
-                'transport' => MomentumTransport::class,
-                'key'       => 'value',
-            ]);
-
-        $queueConsumerEvent->expects($this->once())
-            ->method('checkTransport')
-            ->with(MomentumTransport::class)
-            ->willReturn(true);
-
-        $this->requestStorageHelperMock->expects($this->once())
-            ->method('getRequest')
-            ->with('value')
-            ->will($this->throwException(new \UnexpectedValueException('Error message')));
-
-        $this->momentumCallbackMock->expects($this->never())
-            ->method('processCallbackRequest');
-
-        $this->loggerMock->expects($this->once())
-            ->method('error')
-            ->with('Error message');
 
         $queueConsumerEvent->expects($this->once())
             ->method('setResult')

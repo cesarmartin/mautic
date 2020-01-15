@@ -38,9 +38,7 @@ class TrackingPixelHelper
             return $response;
         }
 
-        if (ini_get('ignore_user_abort')) {
-            ignore_user_abort(true);
-        }
+        ignore_user_abort(true);
 
         //turn off gzip compression
         if (function_exists('apache_setenv')) {

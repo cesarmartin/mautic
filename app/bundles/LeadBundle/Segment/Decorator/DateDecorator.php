@@ -54,8 +54,6 @@ class DateDecorator extends CustomMappedDecorator
     }
 
     /**
-     * @deprecated Use DateOptionParameters->getDefaultDate() which takes timezone into account
-     *
      * @param null|string $relativeDate
      *
      * @return DateTimeHelper
@@ -66,8 +64,8 @@ class DateDecorator extends CustomMappedDecorator
 
         if ($relativeDate) {
             return new DateTimeHelper($relativeDate, null, $timezone);
+        } else {
+            return new DateTimeHelper('midnight today', null, $timezone);
         }
-
-        return new DateTimeHelper('midnight today', null, $timezone);
     }
 }

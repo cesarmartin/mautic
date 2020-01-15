@@ -43,19 +43,12 @@ class DateOptionFactory
      */
     private $relativeDate;
 
-    /**
-     * @var TimezoneResolver
-     */
-    private $timezoneResolver;
-
     public function __construct(
         DateDecorator $dateDecorator,
-        RelativeDate $relativeDate,
-        TimezoneResolver $timezoneResolver
+        RelativeDate $relativeDate
     ) {
-        $this->dateDecorator    = $dateDecorator;
-        $this->relativeDate     = $relativeDate;
-        $this->timezoneResolver = $timezoneResolver;
+        $this->dateDecorator = $dateDecorator;
+        $this->relativeDate  = $relativeDate;
     }
 
     /**
@@ -67,8 +60,7 @@ class DateOptionFactory
     {
         $originalValue        = $leadSegmentFilterCrate->getFilter();
         $relativeDateStrings  = $this->relativeDate->getRelativeDateStrings();
-
-        $dateOptionParameters = new DateOptionParameters($leadSegmentFilterCrate, $relativeDateStrings, $this->timezoneResolver);
+        $dateOptionParameters = new DateOptionParameters($leadSegmentFilterCrate, $relativeDateStrings);
 
         $timeframe = $dateOptionParameters->getTimeframe();
 
@@ -79,7 +71,11 @@ class DateOptionFactory
         switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
-                return new DateAnniversary($this->dateDecorator, $dateOptionParameters);
+            case $timeframe && (
+                    false !== strpos($timeframe, 'anniversary') ||
+                    false !== strpos($timeframe, 'birthday')
+                ):
+                return new DateAnniversary($this->dateDecorator);
             case 'today':
                 return new DateDayToday($this->dateDecorator, $dateOptionParameters);
             case 'tomorrow':
@@ -109,7 +105,7 @@ class DateOptionFactory
                     false !== strpos($timeframe[0], '+') || // +5 days
                     false !== strpos($timeframe, ' ago')    // 5 days ago
                 ):
-                return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
+                return new DateRelativeInterval($this->dateDecorator, $originalValue);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
         }
