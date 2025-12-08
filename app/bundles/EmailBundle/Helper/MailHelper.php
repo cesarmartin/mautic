@@ -1954,6 +1954,14 @@ class MailHelper
                 $email .= '_'.($idHash ?: $this->idHash);
             }
             $monitoredEmail = $email.'@'.$domain;
+        } elseif (!empty($this->returnPath) && ($idHash || $this->idHash)) {
+            // Use mailer_return_path as base when monitoring is not configured
+            // but we still want tracking hash for bounce tracking
+            if (strpos($this->returnPath, '@') !== false) {
+                list($email, $domain) = explode('@', $this->returnPath);
+                $email .= '+bounce_'.($idHash ?: $this->idHash);
+                $monitoredEmail = $email.'@'.$domain;
+            }
         }
 
         return $monitoredEmail;
